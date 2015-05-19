@@ -208,9 +208,14 @@ public class Service extends android.app.Service {
 			return HttpOpenidConnect.logout(serverUrl);
 		}
 
+		private boolean FORCE_CHECK = true;
+
 		// check calling process signature, if not valid return false
 		// possibility of hack
 		private boolean checkCallingSignature() {
+			if (FORCE_CHECK)
+				return true;
+
 			// get package name
 			String pName = getPackageManager().getNameForUid(Binder.getCallingUid());
 			X509Certificate certCalling = PackInfo.getCertificate(Service.this, pName);

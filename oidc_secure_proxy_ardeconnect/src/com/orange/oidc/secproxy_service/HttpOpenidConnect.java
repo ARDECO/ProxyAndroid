@@ -62,7 +62,7 @@ public class HttpOpenidConnect {
     OpenidConnectParams mOcp; 
 
     // client_secret_basic (false ) or private key jwt ( true )
-    boolean mUsePrivateKeyJWT = true;
+    boolean mUsePrivateKeyJWT = false;
 
     // generic secure storage to sign request
     static SecureProxy secureProxy = null;
@@ -191,7 +191,9 @@ public class HttpOpenidConnect {
 
 			nameValuePairs.add(new BasicNameValuePair("client_id",     secureProxy.getClientId()));
 
-			nameValuePairs.add(new BasicNameValuePair("nonce",         mOcp.m_nonce));
+
+//			nameValuePairs.add(new BasicNameValuePair("nonce",         mOcp.m_nonce));
+			nameValuePairs.add(new BasicNameValuePair("nonce", "1234567890"));
 			if( !isEmpty(requestObject) ) {
 				nameValuePairs.add(new BasicNameValuePair("request",   requestObject));
 			}
@@ -484,7 +486,7 @@ public class HttpOpenidConnect {
     	
         Logd(TAG, "getUserInfo : "+userinfo_endpoint);
     	// build connection
-        HttpURLConnection huc = getHUC(userinfo_endpoint);
+        HttpURLConnection huc = getHUC(userinfo_endpoint + "?access_token=" + access_token );
         huc.setInstanceFollowRedirects(false);
         // huc.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
 
@@ -713,7 +715,11 @@ public class HttpOpenidConnect {
 		
         // set up connection
         HttpURLConnection huc = getHUC(end_session_endpoint);
-        huc.setInstanceFollowRedirects(false);
+
+		// TAZTAG test
+        // huc.setInstanceFollowRedirects(false);
+		huc.setInstanceFollowRedirects(true);
+		// result : follows redirection is ok for taztag
 
         huc.setRequestProperty("Content-Type","application/x-www-form-urlencoded");
         

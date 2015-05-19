@@ -188,7 +188,10 @@ public class WebViewActivity extends Activity {
 			Logd(TAG,"webview post params: "+postParams);
 
 			// connect to server
-			mWebView.postUrl(server_url, postParams.getBytes());
+			// mWebView.postUrl(server_url, postParams.getBytes());
+
+			mWebView.loadUrl(new String(server_url  + "?" + postParams));
+
 			
 		} catch (Exception e) {
 			// end activity in case of error
