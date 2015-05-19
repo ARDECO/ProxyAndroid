@@ -41,7 +41,7 @@ import android.widget.LinearLayout.LayoutParams;
 import com.orange.oidc.secproxy_service.IRemoteServiceInternal;
 
 public class WebViewActivity extends Activity {
-	protected static final String TAG = "WebViewActivity";
+	protected static final String TAG = WebViewActivity.class.getName();
 
 	public WebView mWebView;
 

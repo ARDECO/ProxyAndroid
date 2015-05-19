@@ -62,7 +62,7 @@ import android.widget.Toast;
  */
 public class Service extends android.app.Service {
 
-	protected static final String TAG = "Service";
+	protected static final String TAG = Service.class.getName();
 	
 	final static String EMPTY = "";
 	
@@ -299,6 +299,7 @@ public class Service extends android.app.Service {
 
 		        	JSONObject jObject = null;
 		        	try {
+						Logd(TAG,"tokens: "+tokens);
 		        		jObject = new JSONObject(tokens);
 		        	} catch (JSONException je){
 		        		// check if it is JWE
@@ -548,6 +549,7 @@ public class Service extends android.app.Service {
 	
 	// get a string from a json object
 	String getFromJS(JSONObject jo, String name){
+		Log.d(TAG, "getFromJS " + name );
 		if ( jo != null ) {
 			try {
 				return jo.getString(name);

@@ -53,7 +53,7 @@ import android.util.Base64;
 import android.util.Log;
 
 public class HttpOpenidConnect {
-    protected static final String TAG = "HttpOpenidConnect";
+    protected static final String TAG = HttpOpenidConnect.class.getName();
     static final String COOKIES_HEADER = "Set-Cookie";
 	
 	final static String openIdConfigurationUrl = ".well-known/openid-configuration";
@@ -83,6 +83,8 @@ public class HttpOpenidConnect {
    
     // convert OpenidConnectParams to a HTTP POST string
     public String getPostParams() {
+		Log.d(TAG, "getPostParams");
+
 		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(7);
 		nameValuePairs.add(new BasicNameValuePair("grant_type", "code"));
 		if(mOcp!=null) {
@@ -151,12 +153,15 @@ public class HttpOpenidConnect {
 				// get authorization end_point
 				authorization_endpoint = json.optString("authorization_endpoint");
 
+				Logd(TAG,"authorization_endpoint : "+authorization_endpoint);
+
 				// get jwks_uri of the server
 				String jwks_uri = json.optString("jwks_uri");
 				if( jwks_uri==null || jwks_uri.length()<1) {
 	                Logd(TAG,"could not get jwks_uri from openid-configuration on server : "+mOcp.m_server_url);
 					return false;
 				}
+				Logd(TAG,"jwks_uri : "+jwks_uri);
 				
 				// get jwks
 				String jwks = getHttpString(jwks_uri);
@@ -164,7 +169,8 @@ public class HttpOpenidConnect {
 	                Logd(TAG,"could not get jwks_uri content from : "+jwks_uri);
 					return false;
 				}
-				
+				Logd(TAG,"jwks : "+jwks);
+								
 				// extract public key
 				PublicKey serverPubKey = KryptoUtils.pubKeyFromJwk(jwks);
 				if(serverPubKey==null) {
@@ -199,8 +205,11 @@ public class HttpOpenidConnect {
 			}
 			nameValuePairs.add(new BasicNameValuePair("prompt",        "consent"));
 
+
 			// get URL encoded string from list of key value pairs
 			String postParams = getQuery(nameValuePairs);
+
+			Log.d(TAG, "get URL encoded string from list of key value pairs : " + postParams);
 
 			// launch webview
 
@@ -285,21 +294,31 @@ public class HttpOpenidConnect {
     // get a HTTP connector
    static public HttpURLConnection getHUC(String address) {
        HttpURLConnection http = null;
+
+	   Log.d(TAG, "getHUC for " +  address);
+	   
        try {
            URL url = new URL(address);
 
            if (url.getProtocol().equalsIgnoreCase("https")) {
+
+			   Log.d(TAG, "getHUC https");
+
         	   // only use trustAllHosts and DO_NOT_VERIFY in development process
                trustAllHosts();
                HttpsURLConnection https = (HttpsURLConnection) url.openConnection();
                https.setHostnameVerifier(DO_NOT_VERIFY);
                http = https;
            } else {
+			   Log.d(TAG, "getHUC http");
                http = (HttpURLConnection) url.openConnection();
            }
        } catch (Exception e) {
            e.printStackTrace();
        }
+
+	   Log.d(TAG, "getHUC return connection");
+
        return http;
    }
 
@@ -364,9 +383,16 @@ public class HttpOpenidConnect {
 	public String doRedirect(String urlRedirect) {
         // android.os.Debug.waitForDebugger();
         try {
+			
+			Log.d(TAG, "mOcp.m_redirect_uri=" + mOcp.m_redirect_uri);
+
+			Log.d(TAG, "urlRedirect=" + urlRedirect);
+
             // with server phpOIDC, check for '#'
             if((urlRedirect.startsWith(mOcp.m_redirect_uri+"?")) || (urlRedirect.startsWith(mOcp.m_redirect_uri+"#")))
             {
+				Log.d(TAG, "doRedirect : in check");
+
                 String []params = urlRedirect.substring(mOcp.m_redirect_uri.length()+1).split("&");
                 String code = "";
                 String state = "";
@@ -396,6 +422,9 @@ public class HttpOpenidConnect {
                 	
             		// get token_endpoint endpoint
             		String token_endpoint = getEndpointFromConfigOidc("token_endpoint",mOcp.m_server_url);
+
+					Log.d(TAG, "token_endpoint=" + token_endpoint);
+					
             		if( isEmpty( token_endpoint ) ) {
                         Logd(TAG,"logout : could not get token_endpoint on server : "+mOcp.m_server_url);
             			return null;
@@ -424,8 +453,10 @@ public class HttpOpenidConnect {
                     BufferedWriter writer = new BufferedWriter(out);
 
                     nameValuePairs.add(new BasicNameValuePair("grant_type", "authorization_code"));
+					Logd(TAG,"code: "+ code);
                     nameValuePairs.add(new BasicNameValuePair("code", code));
                     nameValuePairs.add(new BasicNameValuePair("redirect_uri", mOcp.m_redirect_uri));
+					Logd(TAG,"redirect_uri" + mOcp.m_redirect_uri);
                     if( state!=null && state.length()>0 )
                     	nameValuePairs.add(new BasicNameValuePair(state_key, state));
 
@@ -437,7 +468,9 @@ public class HttpOpenidConnect {
                     os.close();
 
                     Logd(TAG, "doRedirect => before connect");
+					Logd(TAG, "huc=" + huc.toString());
                     huc.connect();
+					Logd(TAG, "huc2=" + huc.getContentEncoding());
                     int responseCode = huc.getResponseCode();
                     System.out.println("2 - code "+responseCode);
                     Log.d(TAG, "doRedirect => responseCode "+responseCode);
@@ -473,6 +506,9 @@ public class HttpOpenidConnect {
     static String getUserInfo( String server_url, String access_token ) {
         // android.os.Debug.waitForDebugger();
     	
+		Log.d(TAG, "getUserInfo server_url="+server_url);
+		Log.d(TAG, "getUserInfo access_token="+access_token);
+
     	// check if server is valid
     	if( isEmpty(server_url) || isEmpty(access_token) ) {
     		return null;
@@ -523,6 +559,8 @@ public class HttpOpenidConnect {
     // refresh token
     String refreshToken( String refresh_token ) {
         // android.os.Debug.waitForDebugger();
+
+		Log.d(TAG, "refreshToken= " + refresh_token);
 
     	// check initialization
     	if(mOcp == null || isEmpty(mOcp.m_server_url))

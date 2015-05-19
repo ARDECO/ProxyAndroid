@@ -58,9 +58,10 @@ import android.util.Log;
  */
 public class MySecureProxy extends SecureProxy {
 	
-	protected static final String TAG = "SD Storage";
+	protected static final String TAG = MySecureProxy.class.getName();
 
 	final static String alg = "RS256";
+//	final static String alg = "HS512";
 
 	// JWS signature header
 	static final String signHeader = "{\"alg\":\""+alg+"\",\"kid\":\"k2bdc\"}";
@@ -91,6 +92,13 @@ public class MySecureProxy extends SecureProxy {
 			String scope,
 			PublicKey serverPubKey
 			) {
+
+		Log.d(TAG, "getOidcRequestObject");
+			Log.d(TAG, "server_url  = " + server_url  );
+			Log.d(TAG, "client_id   = " + client_id   );
+			Log.d(TAG, "scope       = " + scope       );
+
+		
 
 		JSONObject object = new JSONObject();
 		try {
