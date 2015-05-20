@@ -67,9 +67,9 @@ public class MySecureProxy extends SecureProxy {
 
 	// client_id and client_secret
 	// here for demo only, must be stored in a secure element
-	static final private String SECURE_PROXY_client_id = "SECURE_PROXY";
+	static final private String SECURE_PROXY_client_id = "piscine";
 
-	static final private String SECURE_PROXY_secret = "Mz45ERjEzODY4OTkxlzcyGImJ6ImppcmEleHAiOI";
+	static final private String SECURE_PROXY_secret = "JleHAiOjEzODY4OTkxMz45ERGImlzcyI6ImppcmE";
     // static final private String SECURE_PROXY_secret = "securesecret";
     // static final private String SECURE_PROXY_secret = "-----BEGIN+RSA+PRIVATE+KEY-----+MC0CAQACBQDjvySxAgMBAAECBQClpuWZAgMA/icCAwDlZwIDANcXAgJx8QICGAc=+-----END+RSA+PRIVATE+KEY-----";
     // static final private String SECURE_PROXY_secret = "-----BEGIN%20RSA%20PRIVATE%20KEY-----%20Mz45ERjEzODY4OTkxlzcyGImJ6ImppcmEleHAiOI%20-----END%20RSA%20PRIVATE%20KEY-----";

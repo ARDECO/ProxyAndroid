@@ -142,7 +142,9 @@ public class Service extends android.app.Service {
 			
 			if(!serverUrl.endsWith("/")) serverUrl += "/";
 			
-			scope = sortScope(scope+" secure_proxy");
+			// TazTag : disables specific scope
+			// scope = sortScope(scope+" secure_proxy");
+ 			scope = sortScope(scope);
 			
 	        OpenidConnectParams ocp = new OpenidConnectParams(serverUrl, client_id, scope, secureProxy.getRedirectUri(), state, nonce, null, null, null);
 
@@ -562,7 +564,8 @@ public class Service extends android.app.Service {
     		scope = scope.toLowerCase(Locale.getDefault());
     		// offline_access is mandatory
     		if ( !scope.contains("offline_access") ) {
-    			scope += " offline_access";
+				// TazTag : disables specific scope
+    			// scope += " offline_access";
     		}
 
     		String scopes[] = scope.split("\\ ");
