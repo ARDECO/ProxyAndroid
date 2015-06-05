@@ -75,7 +75,7 @@ public class MySecureProxy extends SecureProxy {
     // static final private String SECURE_PROXY_secret = "-----BEGIN+RSA+PRIVATE+KEY-----+MC0CAQACBQDjvySxAgMBAAECBQClpuWZAgMA/icCAwDlZwIDANcXAgJx8QICGAc=+-----END+RSA+PRIVATE+KEY-----";
     // static final private String SECURE_PROXY_secret = "-----BEGIN%20RSA%20PRIVATE%20KEY-----%20Mz45ERjEzODY4OTkxlzcyGImJ6ImppcmEleHAiOI%20-----END%20RSA%20PRIVATE%20KEY-----";
 
-    static final private String SECURE_PROXY_redirect_uri = "http://secure_proxy/";
+    static final private String SECURE_PROXY_redirect_uri = "http://piscine.ardeconnect.fr/cb";
 
 	public String getClientId() {
 		return SECURE_PROXY_client_id ;

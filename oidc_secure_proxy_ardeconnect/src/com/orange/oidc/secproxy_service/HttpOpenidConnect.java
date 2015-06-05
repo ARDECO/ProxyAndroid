@@ -155,34 +155,38 @@ public class HttpOpenidConnect {
 
 				Logd(TAG,"authorization_endpoint : "+authorization_endpoint);
 
-				// get jwks_uri of the server
-				String jwks_uri = json.optString("jwks_uri");
-				if( jwks_uri==null || jwks_uri.length()<1) {
-	                Logd(TAG,"could not get jwks_uri from openid-configuration on server : "+mOcp.m_server_url);
-					return false;
-				}
-				Logd(TAG,"jwks_uri : "+jwks_uri);
-				
-				// get jwks
-				String jwks = getHttpString(jwks_uri);
-				if(jwks==null || jwks.length()<1) {
-	                Logd(TAG,"could not get jwks_uri content from : "+jwks_uri);
-					return false;
-				}
-				Logd(TAG,"jwks : "+jwks);
-								
-				// extract public key
-				PublicKey serverPubKey = KryptoUtils.pubKeyFromJwk(jwks);
-				if(serverPubKey==null) {
-	                Logd(TAG,"could not extract public key from jwk : "+jwks);
-					return false;
-				}
-			
-				// get oidc request object
-				requestObject = secureProxy.getOidcRequestObject(mOcp.m_server_url,
-						mOcp.m_client_id, mOcp.m_scope, serverPubKey);
-                Logd(TAG,"secureStorage requestObject : "+requestObject);
 
+				// TAZTAG : no use to define request object if key jwt is not used ?
+				if (mUsePrivateKeyJWT) {
+					// get jwks_uri of the server
+					String jwks_uri = json.optString("jwks_uri");
+					if( jwks_uri==null || jwks_uri.length()<1) {
+						Logd(TAG,"could not get jwks_uri from openid-configuration on server : "+mOcp.m_server_url);
+						return false;
+					}
+					Logd(TAG,"jwks_uri : "+jwks_uri);
+					
+					// get jwks
+					String jwks = getHttpString(jwks_uri);
+					if(jwks==null || jwks.length()<1) {
+						Logd(TAG,"could not get jwks_uri content from : "+jwks_uri);
+						return false;
+					}
+					Logd(TAG,"jwks : "+jwks);
+					
+					// extract public key
+					PublicKey serverPubKey = KryptoUtils.pubKeyFromJwk(jwks);
+					if(serverPubKey==null) {
+						Logd(TAG,"could not extract public key from jwk : "+jwks);
+						return false;
+					}
+					
+					// get oidc request object
+					requestObject = secureProxy.getOidcRequestObject(mOcp.m_server_url,
+																	 mOcp.m_client_id, mOcp.m_scope, serverPubKey);
+					Logd(TAG,"secureStorage requestObject : "+requestObject);
+				}
+					
 			} catch (Exception ee) {
 				// error generating request object
 				ee.printStackTrace();
