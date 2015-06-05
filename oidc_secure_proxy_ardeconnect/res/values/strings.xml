@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">OIDC_PROXY</string>
+    <string name="permDesc">OIDC proxy signature permission mandatory</string>
+    <string name="permLabel">OIDC proxy signature permission</string>
+</resources>
