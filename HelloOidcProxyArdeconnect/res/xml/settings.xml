@@ -12,7 +12,7 @@
             android:summary="URL of the authorization server"
             android:dialogTitle="Server URL"
             android:dialogMessage="provide full path"    
-            android:defaultValue="https://192.168.173.1/phpOpSecureProxy/index.php/" />
+            android:defaultValue="http://idp.ardeconnect.fr/" />
 
     </PreferenceCategory>
     
@@ -34,7 +34,7 @@
             android:summary="Authorization request scope parameter"
             android:dialogTitle="Scope"
             android:dialogMessage="put space between values"    
-            android:defaultValue="openid offline_access email profile" />
+            android:defaultValue="identity" />
 
         
         <EditTextPreference

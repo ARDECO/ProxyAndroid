@@ -28,7 +28,7 @@ import android.widget.TextView;
 // Main display
 public class MainActivity extends Activity {
 
-	protected static final String TAG = "main";
+	protected static final String TAG = MainActivity.class.getName();
 
 	// oidc server connection parameters
 	String serverUrl     = null;
@@ -307,6 +307,9 @@ public class MainActivity extends Activity {
 					// call the remote service with specified parameters
 					if (service != null) {
 						Log.d(TAG, "doLogin : launch get tokens");
+						Log.d(TAG, "doLogin : client_id=" + client_id );
+						
+						
 						if( service.getTokensWithOidcProxy(
 								remoteListenerToken,
 								serverUrl,
@@ -393,7 +396,7 @@ public class MainActivity extends Activity {
 								hideButtons();
 								if(m_user_info!=null) {
 									UserInfo ui = new UserInfo(m_user_info);
-									txtHello.setText("Hello " + ui.get("name") + " ("+ui.get("email") + ")");
+									txtHello.setText("Hello " + ui.get("name") + " ("+ui.get("email") + ") " + ui.get("birthdate") );
 									addToWebview("<font color=\"green\">User info OK</font>");
 								} else {
 									loginBtn.setVisibility(View.VISIBLE);
