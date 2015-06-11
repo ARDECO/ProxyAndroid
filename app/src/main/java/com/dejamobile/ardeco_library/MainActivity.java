@@ -6,13 +6,20 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 
+import com.dejamobile.ardeco.lib.ArdecoCallBack;
+import com.dejamobile.ardeco.lib.Failure;
 import com.dejamobile.ardeco.lib.IServiceEntryPoint;
 import com.dejamobile.ardeco.lib.ServiceEntryPoint;
+import com.dejamobile.ardeco.lib.UserInfo;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -21,10 +28,23 @@ public class MainActivity extends ActionBarActivity {
 
     private static IServiceEntryPoint entryPoint;
 
+    private TextView tvVersion;
+
+    private EditText editTextName;
+
+    private EditText editTextEmail;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        tvVersion = (TextView) findViewById(R.id.tvVersion);
+
+        editTextName = (EditText) findViewById(R.id.editTextName);
+
+        editTextEmail = (EditText) findViewById( R.id.editTextEmail);
+
     }
 
     @Override
@@ -69,6 +89,8 @@ public class MainActivity extends ActionBarActivity {
             try {
                 // Library Call is here for demo purpose
                 libraryVersion = entryPoint.getVersion();
+                tvVersion.setText(libraryVersion);
+
                 Log.d(TAG, "Library version is : " + libraryVersion);
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage());
@@ -81,4 +103,31 @@ public class MainActivity extends ActionBarActivity {
             entryPoint = null;
         }
     };
+
+    public void onClickBtnUpdateInfo(View v){
+        String name = editTextName.getText().toString();
+        String email = editTextEmail.getText().toString();
+        UserInfo userInfo = new UserInfo(email, name, "","");
+        try {
+            entryPoint.updateUserInfo(userInfo, new ArdecoCallBack() {
+                @Override
+                public void onSuccess() throws RemoteException {
+                    Log.d(TAG, "User Info has been successfully updated");
+                }
+
+                @Override
+                public void onFailure(Failure failure) throws RemoteException {
+                    Log.w(TAG, "User Info update has failed with reason : " + failure.name());
+                }
+
+                @Override
+                public IBinder asBinder() {
+                    return null;
+                }
+            });
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+    }
 }

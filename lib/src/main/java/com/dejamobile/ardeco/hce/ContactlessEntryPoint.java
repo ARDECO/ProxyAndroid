@@ -8,6 +8,8 @@ import com.dejamobile.ConvertUtils;
 import com.dejamobile.ardeco.card.APDU;
 import com.dejamobile.ardeco.card.ArdecoApplet;
 import com.dejamobile.ardeco.card.ISOException;
+import com.dejamobile.ardeco.util.DBManager;
+import com.snappydb.SnappydbException;
 
 
 /**
@@ -49,6 +51,11 @@ public class ContactlessEntryPoint extends HostApduService {
 
     @Override
     public void onDeactivated(int i) {
-
+        try {
+            Log.d(TAG,"File System persist");
+            DBManager.getInstance(getApplicationContext()).storeFileSystem();
+        } catch (SnappydbException e) {
+            Log.w(TAG, "File System persist issue " + e.getMessage());
+        }
     }
 }

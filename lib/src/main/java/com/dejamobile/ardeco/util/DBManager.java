@@ -23,6 +23,10 @@ import com.snappydb.SnappydbException;
  */
 public class DBManager {
 
+    private static final String TAG = DBManager.class.getCanonicalName();
+
+    public static final String ARDECO_DB = "ARDECO_DB";
+    public static final String FS_KEY = "fs";
     private static DBManager instance;
 
     private Context context;
@@ -41,20 +45,28 @@ public class DBManager {
     }
 
     public void openDB() throws SnappydbException {
-        fsDb = DBFactory.open(context);
+        if (fsDb == null || !fsDb.isOpen()) {
+            fsDb = DBFactory.open(context, ARDECO_DB);
+        }
     }
 
     public MasterFile retrieveFileSystem() throws SnappydbException{
-        if (fsDb.exists("fs")) {
-            MasterFile mf = fsDb.getObject("fs", MasterFile.class);
+        if (fsDb.exists(FS_KEY)) {
+            MasterFile mf = fsDb.getObject(FS_KEY, MasterFile.class);
             fsDb.close();
             return mf;
         }
         return null;
     }
 
-    public void storeFileSystem() throws SnappydbException {
-        fsDb.put("fs", MasterFile.getInstance());
+    public synchronized void storeFileSystem() throws SnappydbException {
+        MasterFile mf = retrieveFileSystem();
+        if (null == mf) {
+            fsDb.put(FS_KEY, MasterFile.getInstance());
+        }else{
+            fsDb.del(FS_KEY);
+            fsDb.put(FS_KEY, MasterFile.getInstance());
+        }
         fsDb.close();
     }
 

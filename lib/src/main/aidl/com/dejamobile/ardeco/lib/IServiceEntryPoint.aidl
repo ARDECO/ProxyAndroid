@@ -2,6 +2,7 @@
 package com.dejamobile.ardeco.lib;
 
 import com.dejamobile.ardeco.lib.ArdecoCallBack;
+import com.dejamobile.ardeco.lib.UserInfo;
 
 // Declare any non-default types here with import statements
 
@@ -18,6 +19,10 @@ interface IServiceEntryPoint {
     void readServiceContents(in String communityId, in String serviceId, in ArdecoCallBack callback);
 
     void readServiceTransactions(in String communityId, in String serviceId, in ArdecoCallBack callback);
+
+    void updateUserInfo(in UserInfo userInfo, in ArdecoCallBack callback);
+
+    void readUserInfo(in UserInfo userInfo, in ArdecoCallBack callback);
 
 
 }
