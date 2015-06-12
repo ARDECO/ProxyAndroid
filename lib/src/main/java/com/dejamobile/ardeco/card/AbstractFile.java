@@ -117,4 +117,9 @@ public abstract class AbstractFile {
     public CHVFile getRelevantCHV2File(){
         return (CHVFile) findFirstInHierarchyByFid((short)0x100);
     }
+
+    @Override
+    public String toString() {
+        return Integer.toHexString(fileID);
+    }
 }

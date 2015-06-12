@@ -1,5 +1,7 @@
 package com.dejamobile.ardeco.card;
 
+import android.util.Log;
+
 import java.util.Random;
 
 /**
@@ -44,6 +46,7 @@ public class ArdecoApplet extends HCEApplet{
     private final static byte VERIFY_CARDHOLDER_PIN = (byte) 0x01;
     private final static byte OFFSET_PIN_HEADER = ISO7816.OFFSET_CDATA;
     private final static byte OFFSET_PIN_DATA = ISO7816.OFFSET_CDATA + 1;
+    private static final String TAG = ArdecoApplet.class.getName();
 
     private byte[] randomBuffer = new byte[256];
 
@@ -94,6 +97,7 @@ public class ArdecoApplet extends HCEApplet{
                     ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
                     break;
             }
+        Log.d(TAG, "Selected file is : " + selectedFile);
 
     }
 

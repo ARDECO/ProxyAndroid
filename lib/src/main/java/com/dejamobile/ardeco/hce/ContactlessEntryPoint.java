@@ -42,7 +42,8 @@ public class ContactlessEntryPoint extends HostApduService {
             Log.d(TAG,"ISO Exception : " + ie.getCode());
             return ie.getAsByteArray();
         }catch(Throwable t){
-            Log.e(TAG,"Throwable.");
+            Log.e(TAG,"Throwable." + t.getMessage());
+            return new byte[]{0x6f,0};
         }
         return processedApdu.getResponse();
 

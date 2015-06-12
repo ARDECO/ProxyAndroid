@@ -81,9 +81,9 @@ public class DedicatedFile extends AbstractFile {
         boolean activated = apdu.getBuffer()[ACTIVATED_FLAG_OFFSET] == 1;
 
         AbstractFile createdFile = null;
-        AbstractFile returnedFile = null;
+        AbstractFile returnedFile = this;
 
-        returnedFile = createdFile;
+
         byte recordSize = 0;
 
         switch (fileType) {
@@ -93,24 +93,22 @@ public class DedicatedFile extends AbstractFile {
                 } else {
                     createdFile = new ElementaryFile(fid, this, tmpAC, fileSize);
                 }
-                returnedFile = this;
+
                 break;
             case FILE_TYPE_VAR_RECORD:
                 createdFile = new VariableLinearFile(fid, this, tmpAC, numberOfRecords);
-                returnedFile = this;
                 break;
             case FILE_TYPE_CYCLIC:
                 recordSize = apdu.getBuffer()[RECORD_SIZE_OFFSET];
                 createdFile = new CyclicFile(fid, this, tmpAC, numberOfRecords, recordSize);
-                returnedFile = this;
                 break;
             case FILE_TYPE_DF:
                 createdFile = new DedicatedFile(fid, this, tmpAC);
+                returnedFile = createdFile;
                 break;
             case FILE_TYPE_FIXED_RECORD:
                 recordSize = apdu.getBuffer()[RECORD_SIZE_OFFSET];
                 createdFile = new FixedLinearFile(fid, this, tmpAC, numberOfRecords, recordSize);
-                returnedFile = this;
                 break;
             default:
                 ISOException.throwIt(ISO7816.SW_DATA_INVALID);
@@ -152,11 +150,12 @@ public class DedicatedFile extends AbstractFile {
     }
 
     public byte getNumberOfSiblings() {
+
         return number;
     }
 
     public AbstractFile getSibling(short fid) {
-        for (byte i = 0; i < number; i++) {
+        for (byte i = 0; i < getNumberOfSiblings(); i++) {
             if (siblings[i].getFileID() == fid)
                 return siblings[i];
         }
