@@ -107,7 +107,7 @@ public class MainActivity extends ActionBarActivity {
     public void onClickBtnUpdateInfo(View v){
         String name = editTextName.getText().toString();
         String email = editTextEmail.getText().toString();
-        UserInfo userInfo = new UserInfo(email, name, "","");
+        UserInfo userInfo = new UserInfo(email, name, "","", new byte[]{1,2,3,4,5,6,7,8,9});
         try {
             entryPoint.updateUserInfo(userInfo, new ArdecoCallBack() {
                 @Override
