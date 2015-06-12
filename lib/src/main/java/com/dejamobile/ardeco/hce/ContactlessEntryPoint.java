@@ -30,8 +30,6 @@ public class ContactlessEntryPoint extends HostApduService {
     @Override
     public byte[] processCommandApdu(byte[] apdu, Bundle bundle) {
 
-        byte[] response = null;
-
         Log.d(TAG,"Received APDU : " + ConvertUtils.toHexString(apdu));
         APDU processedApdu = new APDU(apdu);
 

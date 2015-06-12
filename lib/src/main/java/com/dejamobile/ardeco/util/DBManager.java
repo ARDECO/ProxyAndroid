@@ -44,16 +44,16 @@ public class DBManager {
         return instance;
     }
 
-    public void openDB() throws SnappydbException {
+    private void openDB() throws SnappydbException {
         if (fsDb == null || !fsDb.isOpen()) {
             fsDb = DBFactory.open(context, ARDECO_DB);
         }
     }
 
     public MasterFile retrieveFileSystem() throws SnappydbException{
+        openDB();
         if (fsDb.exists(FS_KEY)) {
             MasterFile mf = fsDb.getObject(FS_KEY, MasterFile.class);
-            fsDb.close();
             return mf;
         }
         return null;
