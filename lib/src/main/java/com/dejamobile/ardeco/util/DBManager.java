@@ -51,6 +51,9 @@ public class DBManager {
     }
 
     public MasterFile retrieveFileSystem() throws SnappydbException{
+        if (fsDb == null ) {
+            openDB() ;
+        }
         if (fsDb.exists(FS_KEY)) {
             MasterFile mf = fsDb.getObject(FS_KEY, MasterFile.class);
             fsDb.close();

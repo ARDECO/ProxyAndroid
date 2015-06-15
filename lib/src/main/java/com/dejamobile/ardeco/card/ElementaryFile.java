@@ -36,10 +36,10 @@ public class ElementaryFile extends AbstractFile {
 		short le = apdu.setOutgoing();
 		// impossible to start reading from offset large than size of file
 
-		if (offset > getCurrentSize())
+		if (offset > getMaxSize())
 			ISOException.throwIt(ISO7816.SW_WRONG_P1P2);
 		// number of bytes in file starting from offset
-		short remaining = (short) (size - offset);
+		short remaining = (short) (getMaxSize() - offset);
 		if (le == 0) {
 			if (remaining < 256) {
 				// wrong Le field
