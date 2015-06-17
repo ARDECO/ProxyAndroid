@@ -33,7 +33,7 @@ public class ElementaryFile extends AbstractFile {
 		short offset = Util.makeShort(apdu.getBuffer()[ISO7816.OFFSET_P1], apdu
 				.getBuffer()[ISO7816.OFFSET_P2]);
 		// inform the JCRE that the applet has data to return
-		short le = apdu.setOutgoing();
+		short le = (short)(0xff & apdu.setOutgoing());
 		// impossible to start reading from offset large than size of file
 
 		if (offset > getMaxSize())
