@@ -115,6 +115,9 @@ public class ArdecoApplet extends HCEApplet{
             case (byte) 0x00:
                 selectByFileIdentifier(apdu, buffer);
                 break;
+            case (byte) 0x04: // Select by DF name
+                selectByDFName(apdu, buffer) ;
+                break ;
             // case (byte) 0x08:
             // selectByPath(apdu, buffer);
             // break;
@@ -122,6 +125,25 @@ public class ArdecoApplet extends HCEApplet{
                 ISOException.throwIt(ISO7816.SW_INCORRECT_P1P2);
                 break;
         }
+    }
+
+        /**
+         * select file by DF name (here select this APP)
+         */
+    private void selectByDFName(APDU apdu, byte[] buffer) {
+        // receive the data to see which file needs to be selected
+        short byteRead = apdu.setIncomingAndReceive();
+        // check Lc
+        short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0x00FF);
+        byte[] appletAid = new byte[] { (byte)0xA0, (byte)0x00, (byte)0x00, (byte)0x05, (byte)0x45, (byte)0x41, (byte)0x72, (byte)0x64, (byte)0x65, (byte)0x63, (byte)0x6F} ;
+        if( lc != appletAid.length) {
+            ISOException.throwIt(ISO7816.SW_FILE_INVALID);
+        }
+        byte b = Util.arrayCompare(buffer, ISO7816.OFFSET_CDATA, appletAid, (short)0, (byte)lc);
+        if( b != 0) {
+            ISOException.throwIt(ISO7816.SW_FILE_INVALID);
+        }
+        selectedFile = masterFile;
     }
 
     /**

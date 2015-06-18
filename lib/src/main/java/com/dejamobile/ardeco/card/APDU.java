@@ -31,7 +31,7 @@ public class APDU {
         p1 = buffer[ISO7816.OFFSET_P1];
         p2 = buffer[ISO7816.OFFSET_P2];
         if (buffer.length > 4) {
-            Lc = buffer[ISO7816.OFFSET_LC];
+            Lc = buffer[ISO7816.OFFSET_LC] ;
             if (buffer.length == 5)
             Le = Lc;
         }
