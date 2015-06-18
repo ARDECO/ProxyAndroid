@@ -62,7 +62,7 @@ public class ArdecoApplet extends HCEApplet{
 
         byte[] buffer = apdu.getBuffer();
 
-        if (buffer[ISO7816.OFFSET_CLA] == ARDECO_CLA_1)
+        if (buffer[ISO7816.OFFSET_CLA] == ARDECO_CLA_1) {
             // check the INS
             switch (buffer[ISO7816.OFFSET_INS]) {
 
@@ -97,7 +97,10 @@ public class ArdecoApplet extends HCEApplet{
                     ISOException.throwIt(ISO7816.SW_INS_NOT_SUPPORTED);
                     break;
             }
-        Log.d(TAG, "Selected file is : " + selectedFile);
+            Log.d(TAG, "Selected file is : " + selectedFile);
+        } else {
+            ISOException.throwIt(ISO7816.SW_CLA_NOT_SUPPORTED);
+        }
 
     }
 
