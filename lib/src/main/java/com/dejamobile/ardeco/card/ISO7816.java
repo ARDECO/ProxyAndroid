@@ -28,4 +28,6 @@ interface ISO7816 {
     short SW_FILE_NOT_FOUND = 0x6a82;
     short SW_FILE_INVALID = 0x6983;
     short SW_WRONG_PIN_0_TRIES_LEFT = 0x6300;
+
+    short SW_CLA_NOT_SUPPORTED = 0x6E00 ;
 }
