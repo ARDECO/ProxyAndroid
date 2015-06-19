@@ -7,7 +7,7 @@ import java.util.Random;
 /**
  * Created by Sylvain on 04/06/2015.
  */
-public class ArdecoApplet extends HCEApplet{
+public class ArdecoApplet extends HCEApplet {
 
     private final static byte ARDECO_CLA_2 = (byte) 0x80;
     private final static byte ARDECO_CLA_1 = (byte) 0x00;
@@ -106,8 +106,6 @@ public class ArdecoApplet extends HCEApplet{
 
     /**
      * select a file on the ARDECO card
-     *
-     *
      */
     private void selectFile(APDU apdu, byte[] buffer) {
         // check P2
@@ -119,8 +117,8 @@ public class ArdecoApplet extends HCEApplet{
                 selectByFileIdentifier(apdu, buffer);
                 break;
             case (byte) 0x04: // Select by DF name
-                selectByDFName(apdu, buffer) ;
-                break ;
+                selectByDFName(apdu, buffer);
+                break;
             // case (byte) 0x08:
             // selectByPath(apdu, buffer);
             // break;
@@ -130,23 +128,31 @@ public class ArdecoApplet extends HCEApplet{
         }
     }
 
-        /**
-         * select file by DF name (here select this APP)
-         */
+    /**
+     * select file by DF name (here select this APP)
+     */
     private void selectByDFName(APDU apdu, byte[] buffer) {
         // receive the data to see which file needs to be selected
         short byteRead = apdu.setIncomingAndReceive();
         // check Lc
         short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0x00FF);
-        byte[] appletAid = new byte[] { (byte)0xA0, (byte)0x00, (byte)0x00, (byte)0x05, (byte)0x45, (byte)0x41, (byte)0x72, (byte)0x64, (byte)0x65, (byte)0x63, (byte)0x6F} ;
-        if( lc != appletAid.length) {
+        byte[] appletAid = new byte[]{(byte) 0xA0, (byte) 0x00, (byte) 0x00, (byte) 0x05, (byte) 0x45, (byte) 0x41, (byte) 0x72, (byte) 0x64, (byte) 0x65, (byte) 0x63, (byte) 0x6F};
+        if (lc != appletAid.length) {
             ISOException.throwIt(ISO7816.SW_FILE_INVALID);
         }
-        byte b = Util.arrayCompare(buffer, ISO7816.OFFSET_CDATA, appletAid, (short)0, (byte)lc);
-        if( b != 0) {
+        byte b = Util.arrayCompare(buffer, ISO7816.OFFSET_CDATA, appletAid, (short) 0, (byte) lc);
+        if (b != 0) {
             ISOException.throwIt(ISO7816.SW_FILE_INVALID);
         }
+
         selectedFile = masterFile;
+
+        // Send Fci Information
+        byte[] fci = { (byte)0x6F, (byte)0x04, (byte)0x83, (byte)0x02, (byte)0x00, (byte)0x00   } ;
+        fci[4] = (byte)((selectedFile.getFileID()>>8) & 0xff) ;
+        fci[5] = (byte)((selectedFile.getFileID() ) & 0xff) ;
+        apdu.setOutgoingLength((short) fci.length);
+        apdu.sendBytesLong(fci, (short) 0, (short) fci.length);
     }
 
     /**
@@ -182,26 +188,32 @@ public class ArdecoApplet extends HCEApplet{
 
                 if (pointer.getFileID() == fid) {
                     selectedFile = pointer;
-                    return;
-                }
+                } else {
 
-                do {
-                    s = ((DedicatedFile) pointer).getSibling(fid);
-                    if (s == null)
-                        pointer = pointer.getParent();
-                    else
-                        break;
-                    if (pointer == null)
-                        break;
-                } while (true);
+                    do {
+                        s = ((DedicatedFile) pointer).getSibling(fid);
+                        if (s == null)
+                            pointer = pointer.getParent();
+                        else
+                            break;
+                        if (pointer == null)
+                            break;
+                    } while (true);
 
-                if (s != null)
-                    selectedFile = s;
-                else {
-                    ISOException.throwIt(ISO7816.SW_FILE_NOT_FOUND);
+                    if (s != null)
+                        selectedFile = s;
+                    else {
+                        ISOException.throwIt(ISO7816.SW_FILE_NOT_FOUND);
+                    }
                 }
             }
         }
+        // Send Fci Information
+        byte[] fci = { (byte)0x6F, (byte)0x04, (byte)0x83, (byte)0x02, (byte)0x00, (byte)0x00   } ;
+        fci[4] = (byte)((selectedFile.getFileID()>>8) & 0xff) ;
+        fci[5] = (byte)((selectedFile.getFileID() ) & 0xff) ;
+        apdu.setOutgoingLength((short) fci.length);
+        apdu.sendBytesLong(fci, (short) 0, (short) fci.length);
     }
 
     /**
@@ -218,7 +230,7 @@ public class ArdecoApplet extends HCEApplet{
         switch (buffer[ISO7816.OFFSET_P2]) {
             case CHV1_PIN:
 
-                chvFile=selectedFile.getRelevantCHV1File();
+                chvFile = selectedFile.getRelevantCHV1File();
                 if (chvFile == null)
                     ISOException.throwIt((short) 0x6981);
                 // overwrite previous APDU type
@@ -272,7 +284,7 @@ public class ArdecoApplet extends HCEApplet{
             return;
 
 		/*
-		 * create the correct exception the status word is of the form 0x63Cx
+         * create the correct exception the status word is of the form 0x63Cx
 		 * with x the number of tries left
 		 */
         short sw = (short) (ISO7816.SW_WRONG_PIN_0_TRIES_LEFT | pin.getTriesRemaining());
