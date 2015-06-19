@@ -41,4 +41,40 @@
         android:layout_below="@+id/editTextEmail"
         android:layout_alignParentStart="true"
         android:onClick="onClickBtnUpdateInfo" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/btnUpdateUserInfo"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="33dp"
+        android:id="@+id/linear">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create Comm."
+            android:id="@+id/btnCreateCommunity"
+            android:onClick="onClickBtnCreateCommunity" />
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinnerCommunityId" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create Service"
+            android:id="@+id/btnCreateService"
+            android:onClick="onClickBtnCreateService" />
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinnerServiceId" />
+
+    </LinearLayout>
+
 </RelativeLayout>

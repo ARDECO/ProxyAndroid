@@ -37,7 +37,7 @@ public enum Failure implements Parcelable {
     CLA_INVALID,
     P1_OR_P2_INVALID,
     LC_INVALID,
-    WRONG_LENGTH;
+    WRONG_LENGTH, FILE_NOT_FOUND;
 
 
 

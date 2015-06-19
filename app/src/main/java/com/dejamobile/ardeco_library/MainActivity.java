@@ -12,7 +12,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.dejamobile.ardeco.lib.ArdecoCallBack;
@@ -34,6 +36,11 @@ public class MainActivity extends ActionBarActivity {
 
     private EditText editTextEmail;
 
+    Spinner spinnerCommIds;
+
+    Spinner spinnerServiceIds;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +51,20 @@ public class MainActivity extends ActionBarActivity {
         editTextName = (EditText) findViewById(R.id.editTextName);
 
         editTextEmail = (EditText) findViewById( R.id.editTextEmail);
+
+        spinnerCommIds = (Spinner) findViewById(R.id.spinnerCommunityId);
+        ArrayAdapter<CharSequence> commAdapter = ArrayAdapter.createFromResource(this,
+                R.array.comm_ids_array, android.R.layout.simple_spinner_item);
+        commAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerCommIds.setAdapter(commAdapter);
+
+        spinnerServiceIds = (Spinner) findViewById(R.id.spinnerServiceId);
+        ArrayAdapter<CharSequence> serviceAdapter = ArrayAdapter.createFromResource(this,
+                R.array.service_ids_array, android.R.layout.simple_spinner_item);
+        serviceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerServiceIds.setAdapter(serviceAdapter);
+
+
 
     }
 
@@ -129,5 +150,56 @@ public class MainActivity extends ActionBarActivity {
             e.printStackTrace();
         }
 
+    }
+
+    public void onClickBtnCreateCommunity(View v){
+        final String communityId = (String)spinnerCommIds.getSelectedItem();
+
+        try {
+            entryPoint.createCommunity(communityId, null, new ArdecoCallBack() {
+                @Override
+                public void onSuccess() throws RemoteException {
+                    Log.d(TAG, "Community : " + communityId + " has been successfully created");
+                }
+
+                @Override
+                public void onFailure(Failure failure) throws RemoteException {
+                    Log.w(TAG, "Community : " + communityId + " has not been created. " + failure.name());
+                }
+
+                @Override
+                public IBinder asBinder() {
+                    return null;
+                }
+            });
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void onClickBtnCreateService(View v){
+        final String communityId = (String)spinnerCommIds.getSelectedItem();
+        final String serviceId = (String)spinnerServiceIds.getSelectedItem();
+
+        try {
+            entryPoint.createService(communityId, serviceId, null, new ArdecoCallBack() {
+                @Override
+                public void onSuccess() throws RemoteException {
+                    Log.d(TAG, "Service : " + serviceId + " has been successfully created");
+                }
+
+                @Override
+                public void onFailure(Failure failure) throws RemoteException {
+                    Log.w(TAG, "Service : " + serviceId + " has not been created. " + failure.name());
+                }
+
+                @Override
+                public IBinder asBinder() {
+                    return null;
+                }
+            });
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 }

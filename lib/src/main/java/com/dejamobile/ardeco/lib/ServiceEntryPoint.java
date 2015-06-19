@@ -17,6 +17,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.dejamobile.ardeco.card.MasterFile;
+import com.dejamobile.ardeco.service.ArdecoCardManager;
 import com.dejamobile.ardeco.util.DBManager;
 import com.snappydb.SnappydbException;
 
@@ -45,40 +46,30 @@ public class ServiceEntryPoint extends Service {
         }
 
         public void init(ArdecoCallBack callback){
-            if (callback == null){
-                return;
-            }
+            checkCallback(callback);
 
         }
 
         public void createCommunity(String id, String signature, ArdecoCallBack callback){
-            if (callback == null){
-                return;
-            }
+            checkCallback(callback);
+            ArdecoCardManager.getInstance().createCommunity(id,signature,callback);
         }
 
         public void createService(String communityId, String serviceId, String signature, ArdecoCallBack callback){
-            if (callback == null){
-                return;
-            }
+            checkCallback(callback);
+            ArdecoCardManager.getInstance().createService((short) Integer.parseInt(communityId,16), serviceId, signature,  callback);
         }
 
         public void readServiceContents(String communityId, String serviceId, ArdecoCallBack callback){
-            if (callback == null){
-                return;
-            }
+            checkCallback(callback);
         }
 
         public void readServiceTransactions(String communityId, String serviceId, ArdecoCallBack callback){
-            if (callback == null){
-                return;
-            }
+            checkCallback(callback);
         }
 
         public void updateUserInfo(UserInfo userInfo, ArdecoCallBack callback){
-            if (callback == null){
-                return;
-            }
+            checkCallback(callback);
             Log.d(TAG, "UserInfo name : " + userInfo.getFirstName() + " " + userInfo.getLastName());
             try {
                 callback.onSuccess();
@@ -98,5 +89,11 @@ public class ServiceEntryPoint extends Service {
 
 
 
+    }
+
+    private void checkCallback(ArdecoCallBack callback) {
+        if (callback == null){
+            throw new IllegalArgumentException("callback parameter must not be null");
+        }
     }
 }
