@@ -36,7 +36,9 @@ public class APDU {
             Le = Lc;
         }
     }
-
+    /*
+     * Retrieves apdu buffer, dont clone
+     */
     public byte[] getBuffer() {
         return buffer;
     }

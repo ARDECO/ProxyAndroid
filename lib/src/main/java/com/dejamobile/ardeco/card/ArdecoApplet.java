@@ -118,15 +118,35 @@ public class ArdecoApplet extends HCEApplet{
             case (byte) 0x00:
                 selectByFileIdentifier(apdu, buffer);
                 break;
-            case (byte) 0x04: // Select by DF name
+            case (byte) 0x04:
                 selectByDFName(apdu, buffer) ;
                 break ;
-            // case (byte) 0x08:
-            // selectByPath(apdu, buffer);
-            // break;
+            case (byte) 0x08:
+                selectByPath(apdu, buffer);
+                break;
             default:
                 ISOException.throwIt(ISO7816.SW_INCORRECT_P1P2);
                 break;
+        }
+        // return FCI in command response when file is a DF
+        if (selectedFile instanceof DedicatedFile){
+            Log.d(TAG, "Selected file is a DF : " + selectedFile);
+            DedicatedFile df = (DedicatedFile) selectedFile;
+            if (df.getNumberOfSiblings()>0) {
+                Log.d(TAG, "DF has " + df.getNumberOfSiblings() + " siblings.");
+                apdu.getBuffer()[0] = (byte) 0x6f;
+                apdu.getBuffer()[1] = (byte) (2 + (df.getNumberOfSiblings() * 2));
+                apdu.getBuffer()[2] = (byte) 0x83;
+                apdu.getBuffer()[3] = (byte) (df.getNumberOfSiblings() * 2);
+                for (byte i = 0; i < df.getNumberOfSiblings(); i++) {
+                    AbstractFile af = df.getSiblings()[i];
+                    Util.setShort(apdu.getBuffer(), (short) (4 + (i * 2)), af.getFileID());
+                }
+                Log.d(TAG, "FCI will be sent");
+
+                apdu.setOutgoingLength((short) (4 + (df.getNumberOfSiblings() * 2)));
+                apdu.sendBytesLong(apdu.getBuffer(), (short) 0, (short) (4 + (df.getNumberOfSiblings() * 2)));
+            }
         }
     }
 
@@ -202,6 +222,37 @@ public class ArdecoApplet extends HCEApplet{
                 }
             }
         }
+    }
+
+    /**
+     * select file by path from the MF
+     */
+    private void selectByPath(APDU apdu, byte[] buffer) {
+
+        short byteRead = apdu.setIncomingAndReceive();
+
+        short lc = (short) (buffer[ISO7816.OFFSET_LC] & 0x00FF);
+
+        if (((lc & 1) == 1) || ((byteRead & 1) == 1))
+            ISOException.throwIt(ISO7816.SW_INCORRECT_P1P2);
+        // use the path name in the APDU data to select a file
+        AbstractFile f = masterFile;
+        for (byte i = 0; i < lc; i += 2) {
+            short fid = Util.makeShort(
+                    buffer[(short) (ISO7816.OFFSET_CDATA + i)],
+                    buffer[(short) (ISO7816.OFFSET_CDATA + i + 1)]);
+            // MF en tête ?
+            if ((i == 0) && (fid == MF))
+                f = masterFile;
+            else {
+                if ((f instanceof ElementaryFile) || f == null)
+                    ISOException.throwIt(ISO7816.SW_FILE_NOT_FOUND);
+                f = ((DedicatedFile) f).getSibling(fid);
+            }
+        }
+        if (f == null)
+            ISOException.throwIt(ISO7816.SW_FILE_NOT_FOUND);
+        selectedFile = f;
     }
 
     /**

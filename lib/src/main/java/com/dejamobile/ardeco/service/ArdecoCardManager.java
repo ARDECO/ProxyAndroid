@@ -17,6 +17,9 @@ import com.dejamobile.ardeco.lib.Failure;
  */
 public class ArdecoCardManager {
 
+    private final static String CREATE_DF_APDU_START = "00E000000E7800";
+    private final static String CREATE_DF_APDU_END = "08004F44FF01031F11FF";
+
     private static final String TAG = ArdecoCardManager.class.getCanonicalName();
 
     private static ArdecoCardManager instance;
@@ -32,15 +35,18 @@ public class ArdecoCardManager {
     }
 
     public void createCommunity(String id, String signature, ArdecoCallBack callBack){
-        String createDFApduStart = "00E000000E7800";
-        String createDFApduEnd = "08004F44FF01031F11FF";
-        String createDFApdu = createDFApduStart + id + createDFApduEnd;
+
+        String createDFApdu = CREATE_DF_APDU_START + id + CREATE_DF_APDU_END;
 
         Log.d(TAG, "Community Creation with id : " + id);
 
+        createDF(callBack, createDFApdu);
+    }
+
+    private void createDF(ArdecoCallBack callBack, String createDFApdu) {
         try {
-            AbstractFile communityDF = ((DedicatedFile) MasterFile.getInstance()).createFile(new APDU(ConvertUtils.hex2byte(createDFApdu)));
-            checkDFStatus(communityDF, callBack);
+            AbstractFile df = ((DedicatedFile) MasterFile.getInstance()).createFile(new APDU(ConvertUtils.hex2byte(createDFApdu)));
+            checkDFStatus(df, callBack);
         }catch (ISOException e){
             try {
                 callBack.onFailure(Failure.ILLEGAL_STATE);
@@ -52,23 +58,12 @@ public class ArdecoCardManager {
 
 
     public void createService(short communityId, String servcieId, String signature, ArdecoCallBack callBack){
-        String createDFApduStart = "00E000000E7800";
-        String createDFApduEnd = "08004F44FF01031F11FF";
-        String createDFApdu = createDFApduStart + servcieId + createDFApduEnd;
 
+        String createDFApdu = CREATE_DF_APDU_START + servcieId + CREATE_DF_APDU_END;
         // Community Exists ?
         DedicatedFile df = (DedicatedFile) ((DedicatedFile) MasterFile.getInstance()).getSibling(communityId);
         if (df != null) {
-            try {
-                AbstractFile serviceDF = df.createFile(new APDU(ConvertUtils.hex2byte(createDFApdu)));
-                checkDFStatus(serviceDF, callBack);
-            }catch (ISOException ie){
-                try {
-                    callBack.onFailure(Failure.ILLEGAL_STATE);
-                } catch (RemoteException re) {
-                    Log.w(TAG, re);
-                }
-            }
+            createDF(callBack, createDFApdu);
         }else{
             try {
                 callBack.onFailure(Failure.FILE_NOT_FOUND);

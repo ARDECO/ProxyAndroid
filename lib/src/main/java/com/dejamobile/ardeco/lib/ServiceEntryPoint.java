@@ -79,9 +79,7 @@ public class ServiceEntryPoint extends Service {
         }
 
         public void readUserInfo(UserInfo userInfo, ArdecoCallBack callback){
-            if (callback == null){
-                return;
-            }
+            checkCallback(callback);
         }
 
 

@@ -150,7 +150,6 @@ public class DedicatedFile extends AbstractFile {
     }
 
     public byte getNumberOfSiblings() {
-
         return number;
     }
 
@@ -167,4 +166,7 @@ public class DedicatedFile extends AbstractFile {
             siblings[number++] = s;
     }
 
+    public AbstractFile[] getSiblings() {
+        return siblings;
+    }
 }
