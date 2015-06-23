@@ -9,6 +9,17 @@ import java.util.Random;
  */
 public class ArdecoApplet extends HCEApplet {
 
+    protected final static short MF = (short) 0x3F00;
+    protected final static short EF_CHV1 = (short) 0x0000;
+    protected final static short EF_CHV2 = (short) 0x0100;
+    protected final static short EF_KEY_EXT = (short) 0x0011;
+    protected final static short EF_KEY_INT = (short) 0x0001;
+    protected final static short EF_ATR = (short) 0x2F01;
+    protected final static short EF_ICC_SN = (short) 0x0002;
+    protected final static byte PIN_SIZE = 8;
+    protected final static byte CHV1_PIN = (byte) 0x01;
+    protected final static byte CARDHOLDER_PIN_TRY_LIMIT = 3;
+    protected final static byte CHV2_PIN = (byte) 0x02;
     private final static byte ARDECO_CLA_2 = (byte) 0x80;
     private final static byte ARDECO_CLA_1 = (byte) 0x00;
     // codes of INS byte in the command APDUs
@@ -25,36 +36,17 @@ public class ArdecoApplet extends HCEApplet {
     private final static byte INS_VERIFY_KEY = (byte) 0x2A;
     private final static byte INS_GET_CHALLENGE = (byte) 0x84;
     private final static byte INS_INTERNAL_AUTHENTICATE = (byte) 0x88;
-
     private final static byte INS_EXTERNAL_AUTHENTICATE = (byte) 0x82;
-
     private final static byte INS_CREATE_FILE = (byte) 0xE0;
-
-    protected final static short MF = (short) 0x3F00;
-    protected final static short EF_CHV1 = (short) 0x0000;
-    protected final static short EF_CHV2 = (short) 0x0100;
-    protected final static short EF_KEY_EXT = (short) 0x0011;
-    protected final static short EF_KEY_INT = (short) 0x0001;
-    protected final static short EF_ATR = (short) 0x2F01;
-    protected final static short EF_ICC_SN = (short) 0x0002;
-
-
-    protected final static byte PIN_SIZE = 8;
-    protected final static byte CHV1_PIN = (byte) 0x01;
-    protected final static byte CARDHOLDER_PIN_TRY_LIMIT = 3;
-    protected final static byte CHV2_PIN = (byte) 0x02;
     private final static byte VERIFY_CARDHOLDER_PIN = (byte) 0x01;
     private final static byte OFFSET_PIN_HEADER = ISO7816.OFFSET_CDATA;
     private final static byte OFFSET_PIN_DATA = ISO7816.OFFSET_CDATA + 1;
     private static final String TAG = ArdecoApplet.class.getName();
-
+    protected MasterFile masterFile = MasterFile.getInstance();
     private byte[] randomBuffer = new byte[256];
-
-
+    private byte[] tempBuffer = new byte[256];
     // file selected by SELECT FILE; defaults to the MF
     private AbstractFile selectedFile;
-
-    protected MasterFile masterFile = MasterFile.getInstance();
     private byte previousApduType;
 
     @Override
@@ -126,26 +118,35 @@ public class ArdecoApplet extends HCEApplet {
                 ISOException.throwIt(ISO7816.SW_INCORRECT_P1P2);
                 break;
         }
-        // return FCI in command response when file is a DF
-        if (selectedFile instanceof DedicatedFile){
+
+        // default FCI in command response temporary buffer
+        byte[] fci = {(byte) 0x6F, (byte) 0x04, (byte) 0x83, (byte) 0x02, (byte) 0x00, (byte) 0x00};
+        Util.arrayCopy(fci, (short) 0, tempBuffer, (short) 0, (short) fci.length);
+        Util.setShort(tempBuffer, (short) (4), selectedFile.getFileID());
+        short sendLength = (short) fci.length;
+
+        if (selectedFile instanceof DedicatedFile) {
             Log.d(TAG, "Selected file is a DF : " + selectedFile);
             DedicatedFile df = (DedicatedFile) selectedFile;
-            if (df.getNumberOfSiblings()>0) {
-                Log.d(TAG, "DF has " + df.getNumberOfSiblings() + " siblings.");
-                apdu.getBuffer()[0] = (byte) 0x6f;
-                apdu.getBuffer()[1] = (byte) (2 + (df.getNumberOfSiblings() * 2));
-                apdu.getBuffer()[2] = (byte) 0x83;
-                apdu.getBuffer()[3] = (byte) (df.getNumberOfSiblings() * 2);
+
+            Log.d(TAG, "DF has " + df.getNumberOfSiblings() + " siblings.");
+            tempBuffer[1] = (byte) (4 + 2 + (df.getNumberOfSiblings() * 4));
+            tempBuffer[6] = (byte) 0x85; // Tag 85, Proprietary information, list of file
+            tempBuffer[7] = (byte) (df.getNumberOfSiblings() * 4);
+            sendLength = (short) (8 + (df.getNumberOfSiblings() * 4));
+            if (df.getNumberOfSiblings() > 0) {
                 for (byte i = 0; i < df.getNumberOfSiblings(); i++) {
                     AbstractFile af = df.getSiblings()[i];
-                    Util.setShort(apdu.getBuffer(), (short) (4 + (i * 2)), af.getFileID());
+                    tempBuffer[8 + (i * 4)] = (byte) 0x83;  //Tag
+                    tempBuffer[8 + (i * 4) + 1] = (byte) 0x2;  //Length
+                    Util.setShort(tempBuffer, (short) (8 + (i * 4) + 2), af.getFileID());
                 }
                 Log.d(TAG, "FCI will be sent");
-
-                apdu.setOutgoingLength((short) (4 + (df.getNumberOfSiblings() * 2)));
-                apdu.sendBytesLong(apdu.getBuffer(), (short) 0, (short) (4 + (df.getNumberOfSiblings() * 2)));
             }
         }
+        apdu.setOutgoingLength(sendLength);
+        apdu.sendBytesLong(tempBuffer, (short) 0, sendLength);
+
     }
 
     /**
@@ -330,16 +331,16 @@ public class ArdecoApplet extends HCEApplet {
     }
 
     /**
-     * set the previous APDU type to a certain value
-     */
-    private void setPreviousApduType(byte type) {
-        previousApduType = type;
-    }
-
-    /**
      * return the previous APDU type
      */
     private byte getPreviousApduType() {
         return previousApduType;
+    }
+
+    /**
+     * set the previous APDU type to a certain value
+     */
+    private void setPreviousApduType(byte type) {
+        previousApduType = type;
     }
 }
