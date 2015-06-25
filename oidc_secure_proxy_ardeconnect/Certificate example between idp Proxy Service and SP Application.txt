@@ -1,0 +1,31 @@
+# generate IDP certificate
+CA-IDP
+openssl  req  -config .\openssl.cnf -new  -x509  -keyout  ca-idp.pem.txt -out  ca-idp-certificate.pem.txt  -days  36500
+pass : passidp
+
+# export the public key to include in the proxy service
+openssl x509 -pubkey -text -noout -in ca-idp-certificate.pem.txt
+
+
+# generate SP ( Service provider ) key store
+SP - KeyStore
+keytool -keystore sp_keystore.jks -genkey -alias spclient
+pass : sppass
+
+# Generate the Certificate Signing Request.
+SP - CSR
+keytool -keystore sp_keystore.jks -certreq -alias spclient -keyalg rsa -file sp_client.csr
+
+# Generate a signed certificate for the associated Certificate Signing Request.
+openssl x509 -req  -CA ca-idp-certificate.pem.txt -CAkey ca-idp.pem.txt -in sp_client.csr -out sp_client.cer -days 36500 -CAcreateserial
+use pass : passidp
+
+# Use the keytool to import the CA certificate into the client keystore.
+keytool -import -keystore sp_keystore.jks -file ca-idp-certificate.pem.txt -alias idpCARoot
+use pass : sppass
+
+#Use the keytool to import the signed certificate for the associated client alias in the keystore.
+keytool -import -keystore sp_keystore.jks -file sp_client.cer -alias spclient
+use pass : sppass
+
+# now use this keystore to sign the SP application
