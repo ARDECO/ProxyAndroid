@@ -22,7 +22,7 @@ interface IServiceEntryPoint {
 
     void updateUserInfo(in UserInfo userInfo, in ArdecoCallBack callback);
 
-    void readUserInfo(in UserInfo userInfo, in ArdecoCallBack callback);
+    void readUserInfo(in ArdecoCallBack callback);
 
 
 }

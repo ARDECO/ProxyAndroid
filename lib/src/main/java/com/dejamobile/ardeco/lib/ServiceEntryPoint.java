@@ -52,12 +52,12 @@ public class ServiceEntryPoint extends Service {
 
         public void createCommunity(String id, String signature, ArdecoCallBack callback){
             checkCallback(callback);
-            ArdecoCardManager.getInstance().createCommunity(id,signature,callback);
+            ArdecoCardManager.getInstance().createCommunity(id, signature, callback);
         }
 
         public void createService(String communityId, String serviceId, String signature, ArdecoCallBack callback){
             checkCallback(callback);
-            ArdecoCardManager.getInstance().createService((short) Integer.parseInt(communityId,16), serviceId, signature,  callback);
+            ArdecoCardManager.getInstance().createService((short) Integer.parseInt(communityId, 16), serviceId, signature, callback);
         }
 
         public void readServiceContents(String communityId, String serviceId, ArdecoCallBack callback){
@@ -72,15 +72,39 @@ public class ServiceEntryPoint extends Service {
             checkCallback(callback);
             Log.d(TAG, "UserInfo name : " + userInfo.getName() + " " + userInfo.getFamilyName());
             Log.d(TAG, "UserInfo address : " + userInfo.getAddress().getLocality() + " " + userInfo.getAddress().getPostalCode());
+
+            try {
+                DBManager.getInstance(getApplicationContext()).storeUserInfo(userInfo);
+            } catch (SnappydbException e) {
+                Log.w(TAG, "Something went wrong while storing UserInfo " + e.getMessage(), e);
+                try {
+                    callback.onFailure(Failure.UNKNOWN);
+                } catch (RemoteException e1) {
+                    Log.w(TAG, "Something went wrong while invoking callBack " + e1.getMessage(), e1);
+                }
+            }
             try {
                 callback.onSuccess();
             } catch (RemoteException e) {
-                Log.w(TAG, "Something went wrong will invoking callBack " + e.getMessage());
+                Log.w(TAG, "Something went wrong while invoking callBack " + e.getMessage(), e);
             }
         }
 
-        public void readUserInfo(UserInfo userInfo, ArdecoCallBack callback){
+
+        public void readUserInfo(ArdecoCallBack callback){
             checkCallback(callback);
+
+            try {
+                UserInfo retrievedUserInfo = DBManager.getInstance(getApplicationContext()).retrieveUserInfo();
+                try {
+                    callback.onUserInfoRead(retrievedUserInfo);
+                } catch (RemoteException e) {
+                    Log.w(TAG, "Something went wrong while invoking callBack " + e.getMessage(), e);
+                }
+            } catch (SnappydbException e) {
+                Log.w(TAG, "Something went wrong while reading info " + e.getMessage(), e);
+            }
+
         }
 
 

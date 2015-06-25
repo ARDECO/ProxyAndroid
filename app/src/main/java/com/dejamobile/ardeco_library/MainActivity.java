@@ -137,6 +137,7 @@ public class MainActivity extends ActionBarActivity {
         userInfo.setAddress(address);
         userInfo.setName(name);
         userInfo.setEmail(email);
+        userInfo.setArdecoId("0123456789abcdef");
         try {
             entryPoint.updateUserInfo(userInfo, new ArdecoCallBack() {
                 @Override
@@ -150,6 +151,10 @@ public class MainActivity extends ActionBarActivity {
                 }
 
                 @Override
+                public void onUserInfoRead(UserInfo userInfo) throws RemoteException {
+                }
+
+                @Override
                 public IBinder asBinder() {
                     return null;
                 }
@@ -159,6 +164,40 @@ public class MainActivity extends ActionBarActivity {
         }
 
     }
+
+    public void onClickBtnReadInfo(View v){
+
+        try {
+            entryPoint.readUserInfo(new ArdecoCallBack() {
+                @Override
+                public void onSuccess() throws RemoteException {
+                    Log.d(TAG, "User Info has been successfully Read");
+                }
+
+                @Override
+                public void onFailure(Failure failure) throws RemoteException {
+                    Log.w(TAG, "User Info retrieval has failed with reason : " + failure.name());
+                }
+
+                @Override
+                public void onUserInfoRead(UserInfo userInfo) throws RemoteException {
+                    Log.d(TAG, "User Info has been retrieved");
+                    Log.d(TAG, "User : " + userInfo.getName());
+                    Log.d(TAG, "Email : " + userInfo.getEmail());
+                    Log.d(TAG, "Id : " + userInfo.getArdecoId());
+                }
+
+                @Override
+                public IBinder asBinder() {
+                    return null;
+                }
+            });
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 
     public void onClickBtnCreateCommunity(View v){
         final String communityId = (String)spinnerCommIds.getSelectedItem();
@@ -173,6 +212,11 @@ public class MainActivity extends ActionBarActivity {
                 @Override
                 public void onFailure(Failure failure) throws RemoteException {
                     Log.w(TAG, "Community : " + communityId + " has not been created. " + failure.name());
+                }
+
+                @Override
+                public void onUserInfoRead(UserInfo userInfo) throws RemoteException {
+
                 }
 
                 @Override
@@ -199,6 +243,11 @@ public class MainActivity extends ActionBarActivity {
                 @Override
                 public void onFailure(Failure failure) throws RemoteException {
                     Log.w(TAG, "Service : " + serviceId + " has not been created. " + failure.name());
+                }
+
+                @Override
+                public void onUserInfoRead(UserInfo userInfo) throws RemoteException {
+
                 }
 
                 @Override

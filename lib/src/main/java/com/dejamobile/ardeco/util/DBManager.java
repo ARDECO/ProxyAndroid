@@ -13,6 +13,7 @@ package com.dejamobile.ardeco.util;
 import android.content.Context;
 
 import com.dejamobile.ardeco.card.MasterFile;
+import com.dejamobile.ardeco.lib.UserInfo;
 import com.snappydb.DB;
 import com.snappydb.DBFactory;
 import com.snappydb.SnappydbException;
@@ -27,6 +28,7 @@ public class DBManager {
 
     public static final String ARDECO_DB = "ARDECO_DB";
     public static final String FS_KEY = "fs";
+    public static final String USER_INFO_KEY = "ui";
     private static DBManager instance;
 
     private Context context;
@@ -51,9 +53,9 @@ public class DBManager {
     }
 
     public MasterFile retrieveFileSystem() throws SnappydbException{
-        if (fsDb == null ) {
-            openDB() ;
-        }
+
+        openDB() ;
+
         if (fsDb.exists(FS_KEY)) {
             MasterFile mf = fsDb.getObject(FS_KEY, MasterFile.class);
             return mf;
@@ -68,6 +70,28 @@ public class DBManager {
         }else{
             fsDb.del(FS_KEY);
             fsDb.put(FS_KEY, MasterFile.getInstance());
+        }
+        fsDb.close();
+    }
+
+    public UserInfo retrieveUserInfo() throws SnappydbException{
+
+        openDB() ;
+
+        if (fsDb.exists(USER_INFO_KEY)) {
+            UserInfo userInfo = fsDb.getObject(USER_INFO_KEY, UserInfo.class);
+            return userInfo;
+        }
+        return null;
+    }
+
+    public synchronized void storeUserInfo(UserInfo newUserInfo) throws SnappydbException {
+        UserInfo userInfo = retrieveUserInfo();
+        if (null == userInfo) {
+            fsDb.put(USER_INFO_KEY, newUserInfo);
+        }else{
+            fsDb.del(USER_INFO_KEY);
+            fsDb.put(USER_INFO_KEY, newUserInfo);
         }
         fsDb.close();
     }

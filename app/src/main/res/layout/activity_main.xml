@@ -77,4 +77,13 @@
 
     </LinearLayout>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="READ USER INFO"
+        android:id="@+id/btnReadUserInfo"
+        android:layout_alignTop="@+id/btnUpdateUserInfo"
+        android:layout_alignEnd="@+id/linear"
+        android:onClick="onClickBtnReadInfo" />
+
 </RelativeLayout>

@@ -8,7 +8,7 @@ import android.os.Parcelable;
  */
 public class UserInfo implements Parcelable {
 
-
+    private String ardecoId;
     private String preferredUsername;
     private String name;
     private String givenName;
@@ -32,6 +32,14 @@ public class UserInfo implements Parcelable {
     private byte[] photo;
 
     public UserInfo() {
+    }
+
+    public String getArdecoId() {
+        return ardecoId;
+    }
+
+    public void setArdecoId(String ardecoId) {
+        this.ardecoId = ardecoId;
     }
 
     public String getPreferredUsername() {
@@ -195,6 +203,7 @@ public class UserInfo implements Parcelable {
     }
 
     public UserInfo(Parcel in){
+        ardecoId = in.readString();
         preferredUsername = in.readString();
         name = in.readString();
           givenName = in.readString();
@@ -225,6 +234,7 @@ public class UserInfo implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel out, int i) {
+        out.writeString(ardecoId);
         out.writeString(preferredUsername);
         out.writeString(name);
         out.writeString(givenName);
@@ -247,11 +257,37 @@ public class UserInfo implements Parcelable {
 
     }
 
+    public void readFromParcel(Parcel in){
+        ardecoId = in.readString();
+        preferredUsername = in.readString();
+        name = in.readString();
+        givenName = in.readString();
+        familyName = in.readString();
+        middleName = in.readString();
+        nickname = in.readString();
+        profile = in.readString();
+        in.readByteArray(picture);
+        website = in.readString();
+        email = in.readString();
+        emailVerified = in.readByte() != 0;
+        gender = in.readString();
+        zoneinfo = in.readString();
+        locale = in.readString();
+        phoneNumber = in.readString();
+        phoneNumberVerified = in.readByte() != 0;
+        address = in.readParcelable(Address.class.getClassLoader());
+        updatedTime = in.readString();
+        birthdate = in.readString();
+    }
+
+
+
     public static final Creator<UserInfo> CREATOR = new Creator<UserInfo>() {
         @Override
         public UserInfo createFromParcel(final Parcel source) {
             return new UserInfo(source);
         }
+
 
         @Override
         public UserInfo[] newArray(final int size) {
