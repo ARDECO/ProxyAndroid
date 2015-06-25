@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="service_ids_array">
+        <item>5f00</item>
+        <item>5f01</item>
+        <item>5f02</item>
+        <item>5f03</item>
+        <item>5f04</item>
+        <item>5f05</item>
+        <item>5f06</item>
+        <item>5f07</item>
+    </string-array>
+</resources>
