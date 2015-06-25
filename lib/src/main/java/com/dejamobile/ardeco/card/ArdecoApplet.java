@@ -241,7 +241,7 @@ public class ArdecoApplet extends HCEApplet {
             short fid = Util.makeShort(
                     buffer[(short) (ISO7816.OFFSET_CDATA + i)],
                     buffer[(short) (ISO7816.OFFSET_CDATA + i + 1)]);
-            // MF en tête ?
+            // MF en tete ?
             if ((i == 0) && (fid == MF))
                 f = masterFile;
             else {

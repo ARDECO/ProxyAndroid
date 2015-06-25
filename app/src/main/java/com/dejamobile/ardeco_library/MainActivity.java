@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.dejamobile.ardeco.lib.Address;
 import com.dejamobile.ardeco.lib.ArdecoCallBack;
 import com.dejamobile.ardeco.lib.Failure;
 import com.dejamobile.ardeco.lib.IServiceEntryPoint;
@@ -128,7 +129,14 @@ public class MainActivity extends ActionBarActivity {
     public void onClickBtnUpdateInfo(View v){
         String name = editTextName.getText().toString();
         String email = editTextEmail.getText().toString();
-        UserInfo userInfo = new UserInfo(email, name, "","", new byte[]{1,2,3,4,5,6,7,8,9});
+        UserInfo userInfo = new UserInfo();
+        Address address = new Address();
+        address.setStreetAddress("Rue de l'impasse");
+        address.setPostalCode("14400");
+        address.setLocality("CAEN");
+        userInfo.setAddress(address);
+        userInfo.setName(name);
+        userInfo.setEmail(email);
         try {
             entryPoint.updateUserInfo(userInfo, new ArdecoCallBack() {
                 @Override

@@ -70,7 +70,8 @@ public class ServiceEntryPoint extends Service {
 
         public void updateUserInfo(UserInfo userInfo, ArdecoCallBack callback){
             checkCallback(callback);
-            Log.d(TAG, "UserInfo name : " + userInfo.getFirstName() + " " + userInfo.getLastName());
+            Log.d(TAG, "UserInfo name : " + userInfo.getName() + " " + userInfo.getFamilyName());
+            Log.d(TAG, "UserInfo address : " + userInfo.getAddress().getLocality() + " " + userInfo.getAddress().getPostalCode());
             try {
                 callback.onSuccess();
             } catch (RemoteException e) {
