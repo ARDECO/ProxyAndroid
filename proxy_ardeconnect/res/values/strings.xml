@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ARDECO_PROXY</string>
+    <string name="permDesc">ARDECO proxy signature permission mandatory</string>
+    <string name="permLabel">ARDECO proxy signature permission</string>
+</resources>
