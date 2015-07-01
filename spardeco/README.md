@@ -3,5 +3,6 @@ Simple serveur de fournisseur de service pour ARDECO en PHP/MySql
 ######################
 Fichiers importants :
 
-database.sql : contenu de la base de données
-includes\config.php : paramètres d'accès à la base de données et paramètres d'accès au serveur fournisseur d'identité
+database.sql : contenu de la base de donnÃ©es
+
+includes\config.php : paramÃ¨tres d'accÃ¨s Ã  la base de donnÃ©es et paramÃ¨tres d'accÃ¨s au serveur fournisseur d'identitÃ©
