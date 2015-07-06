@@ -26,6 +26,8 @@ interface IRemoteListener {
     *
     * @param spCode
     *           a code return by the service provide, null if canceled or on error
+    * @param spParameter
+    *           contains information from SP : secret allowing to access session
     * @param errorMessage
     *           error message if any
     * @param user_cancel
@@ -34,6 +36,7 @@ interface IRemoteListener {
     */
     void handleSpCode (
         String spCode,
+        inout Bundle spParameter,
         String errorMessage,
         boolean user_cancel
         );

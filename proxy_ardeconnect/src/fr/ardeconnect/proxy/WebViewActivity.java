@@ -20,6 +20,8 @@ package fr.ardeconnect.proxy;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -30,14 +32,15 @@ import android.net.http.SslError;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
+import android.webkit.CookieManager;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
-
 import fr.ardeconnect.proxy.IRemoteServiceInternal;
 
 public class WebViewActivity extends Activity {
@@ -48,7 +51,7 @@ public class WebViewActivity extends Activity {
 	String id;
 	String login;
 	String m_endproxy_uri;
-	
+
 	boolean shouldFinish = false;	
 	IRemoteServiceInternal remoteSI;
 	RemoteServiceConnection connection;
@@ -181,16 +184,13 @@ public class WebViewActivity extends Activity {
 			// get webview loading parameters
 			String url = intent.getStringExtra("spEnrollUrl");
 			if( !url.endsWith("/" ) ) url += "/";
-			m_endproxy_uri = url+"endproxy?";
+			m_endproxy_uri = url+"endproxy.php?";
 			login = intent.getStringExtra("login");
 			
 			Logd(TAG,"webview sp enroll url: "+url);
 
-			// connect to server
-			// mWebView.postUrl(server_url, postParams.getBytes());
-
-			// mWebView.loadUrl(url);
-			mWebView.postUrl(url,"proxy=1".getBytes());
+			// connect to server authorize endpoint
+			mWebView.loadUrl(url + "authorize");
 
 			
 		} catch (Exception e) {
@@ -227,6 +227,10 @@ public class WebViewActivity extends Activity {
         @Override
         public boolean shouldOverrideUrlLoading (WebView view, String url) {
             Logd(TAG, "shouldOverrideUrlLoading: "+url);
+
+            Logd(TAG, "shouldOverrideUrlLoading m_endproxy_uri="+m_endproxy_uri);
+			
+
             // check if new url is specified m_endproxy_uri
             if( m_endproxy_uri != null && url.startsWith(m_endproxy_uri) ) {
             	
@@ -240,9 +244,21 @@ public class WebViewActivity extends Activity {
                 try {
                 	// m_endproxy_uri recall to remote service 
                 	if( remoteSI != null ) {
+
+						CookieManager mgr = CookieManager.getInstance();
+						String cookie = mgr.getCookie(url);
+						if (cookie.startsWith("laravel_session=")) {
+							Logd(TAG, "cookie : " + cookie);
+						}
+						
+
                 		// TODO : display progress bar or hourglass
                         Logd(TAG, "sending back result 1");
-                        remoteSI.setSpCode( id, url.substring(m_endproxy_uri.length()) );
+
+						Bundle spParameter = new Bundle();
+						spParameter.putString("sessionSecret", cookie);
+
+						remoteSI.setSpCode( id, url.substring(m_endproxy_uri.length()), spParameter );
                 	}
 				} catch (Exception e) {
 					e.printStackTrace();

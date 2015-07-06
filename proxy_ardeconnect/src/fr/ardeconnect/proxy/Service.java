@@ -51,14 +51,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import fr.ardeconnect.proxy.IRemoteListener;
-
 import fr.ardeconnect.proxy.IRemoteService;
 import fr.ardeconnect.proxy.IRemoteServiceInternal;
-
 import fr.ardeconnect.proxy.R;
-
 import fr.ardeconnect.proxy.WebViewActivity;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -67,6 +63,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
@@ -260,14 +257,14 @@ public class Service extends android.app.Service {
 			}
 			
 			if( rl != null  ) {
-        		rl.listener.handleSpCode(EMPTY, EMPTY, user );
+				rl.listener.handleSpCode(EMPTY, null, EMPTY, user );
 			}
 
 			// hideNotifIcon();
 		}
 
 		@Override
-		public void setSpCode( String id, String spCode ) {
+		public void setSpCode( String id, String spCode, Bundle spParameter ) {
 			
 			// check caller uid
 			if( checkCallingUid() == false ) {
@@ -299,7 +296,7 @@ public class Service extends android.app.Service {
 			if( rl != null ) {
 				// get code from SP
         		try {
-   					rl.listener.handleSpCode(spCode, EMPTY, false );
+   					rl.listener.handleSpCode(spCode, spParameter, EMPTY, false );
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

@@ -17,9 +17,7 @@ import javax.net.ssl.X509TrustManager;
 
 import fr.ardeconnect.hello.R;
 import fr.ardeconnect.proxy.IRemoteListener;
-
 import fr.ardeconnect.proxy.IRemoteService;
-
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -36,7 +34,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -338,10 +339,13 @@ public class MainActivity extends Activity {
 		@Override
 		public     void handleSpCode (
 		        String spCode,
+		        Bundle spParameter,
 		        final String errorMessage,
 		        final boolean user_cancel
 		        ) throws RemoteException {
 			
+			
+		
 			Log.d(TAG,"handleTokenResponseWithOidcProxy : "+spCode);
 			System.out.println("handleTokenResponse");
 
@@ -354,6 +358,8 @@ public class MainActivity extends Activity {
 			}
 			
 			if( m_sub!=null && m_sub.length()>0 ) {
+
+				
 				runOnUiThread(new Runnable() {
 					
 					@Override
@@ -362,7 +368,10 @@ public class MainActivity extends Activity {
 						addToWebview("<font color=\"green\">enrolled</font>");
 					}
 				});
-				getSP_UserInfo();
+				
+				Log.d(TAG, "cookie : " + spParameter.getString(new String("sessionSecret")));
+				checkTickets(spParameter.getString(new String("sessionSecret")));
+//				getSP_UserInfo();
 			} else {
 				// get user info
 				runOnUiThread(new Runnable() {
@@ -382,6 +391,29 @@ public class MainActivity extends Activity {
 		}
 
 	};
+
+
+
+
+
+	private void checkTickets(String cookie) {
+
+
+		String myUrl = "http://piscine.ardeconnect.fr/tickets"; 
+		CookieSyncManager.createInstance(this); 
+		CookieManager cookieManager = CookieManager.getInstance(); 
+		//Cookie sessionCookie =  getCookie(); 
+		cookieManager.setCookie("piscine.ardeconnect.fr", cookie); 
+		
+		WebView webView = (WebView) findViewById(R.id.webView); 
+		webView.getSettings().setBuiltInZoomControls(true); 
+		webView.getSettings().setJavaScriptEnabled(true); 
+		webView.setWebViewClient(new WebViewClient());
+		webView.loadUrl(myUrl);
+		
+	}
+
+
 	
 	// display toast to screen
 	void toast(String msg, int duration) {
